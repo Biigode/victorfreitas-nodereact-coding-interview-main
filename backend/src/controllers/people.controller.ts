@@ -1,41 +1,45 @@
 import {
-    JsonController,
-    Get,
-    HttpCode,
-    NotFoundError,
-    Param,
-} from 'routing-controllers';
-import { PeopleProcessing } from '../services/people_processing.service';
+  Get,
+  HttpCode,
+  JsonController,
+  NotFoundError,
+  Param,
+  QueryParam,
+} from "routing-controllers";
+import { PeopleProcessing } from "../services/people_processing.service";
 
 const peopleProcessing = new PeopleProcessing();
 
-@JsonController('/people', { transformResponse: false })
+@JsonController("/people", { transformResponse: false })
 export default class PeopleController {
-    @HttpCode(200)
-    @Get('/all')
-    getAllPeople() {
-        const people = peopleProcessing.getAll();
+  @HttpCode(200)
+  @Get("/all")
+  getAllPeople(
+    @QueryParam("page") page: number,
+    @QueryParam("query") query: string
+  ) {
+    const people = peopleProcessing.getAll(page, 10, query);
 
-        if (!people) {
-            throw new NotFoundError('No people found');
-        }
-
-        return {
-            data: people,
-        };
+    if (!people) {
+      throw new NotFoundError("No people found");
     }
 
-    @HttpCode(200)
-    @Get('/:id')
-    getPerson(@Param('id') id: number) {
-        const person = peopleProcessing.getById(id);
+    return {
+      data: people,
+    };
+  }
 
-        if (!person) {
-            throw new NotFoundError('No person found');
-        }
+  @HttpCode(200)
+  @Get("/:id")
+  getPerson(@Param("id") id: number) {
+    const person = peopleProcessing.getById(id);
 
-        return {
-            data: person,
-        };
+    if (!person) {
+      throw new NotFoundError("No person found");
     }
+
+    return {
+      data: person,
+    };
+  }
 }
